@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head lang="en-us">
+    <title>Print Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link href="//js.arcgis.com/3.13compact/esri/css/esri.css" rel="stylesheet" />
+    <link href="index.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="flexcontainer">
+        <div class="map-container">
+            <div id="map">
+                <progress class="map-progress">Loading...</progress>
+            </div>
+        </div>
+        <div id="tools">
+        </div>
+    </div>
+    <script>
+        (function (root) {
+            var dojoConfig = {
+                async: true,
+                packages: [
+                   {
+                       name: "ArcGisPrintUI",
+                       location: root + "/..",
+                       main: "ArcGisPrintUI"
+                   }
+                ]
+
+            };
+            window.dojoConfig = dojoConfig;
+        }(location.pathname.replace(/\/[^\/]*$/, "")));
+    </script>
+    <script src="//js.arcgis.com/3.13compact/init.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
