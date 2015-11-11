@@ -108,6 +108,15 @@ define([
         return form;
     }
 
+    /**
+     * UI for PrintTask
+     * @constructor
+     * @param {string} printUrl - URL to an ArcGIS Server print service.
+     * @param {esri/Map} [map] - ArcGIS API map. Optional. Can be set later via the map property.
+     * @property {esri/Map} map
+     * @property {esri/tasks/PrintTask} printTask
+     * @property {HTMLFormElement} form
+     */
     function PrintUI(printUrl, map) {
         var form = createForm(printUrl);
         this.map = map || null;
