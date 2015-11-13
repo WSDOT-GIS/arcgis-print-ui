@@ -1,0 +1,30 @@
+{
+  "name": "arcgis-print-ui",
+  "homepage": "https://github.com/WSDOT-GIS/arcgis-print-ui",
+  "authors": [
+    "WSDOT-GIS"
+  ],
+  "description": "UI for ArcGIS Server print services",
+  "main": "ArcGisPrintUI.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "ArcGIS",
+    "print",
+    "export",
+    "map"
+  ],
+  "license": "Unlicense",
+  "ignore": [
+    "**/.*",
+    "*.csproj",
+    "*.sln",
+    "bin",
+    "obj",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

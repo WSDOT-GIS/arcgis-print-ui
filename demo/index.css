@@ -74,6 +74,10 @@ body {
     z-index: 50;
 }
 
+.btn-group-justified > div {
+    display: inline-block;
+}
+
 .map[data-updating] > .map-progress {
     display: block;
 }
