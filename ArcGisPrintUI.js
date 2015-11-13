@@ -138,16 +138,6 @@ define([
             printTemplate.copyrightText = form.copyrightText.value;
             printTemplate.scalebarUnit = form.scalebarUnit.value;
 
-            if (form.preserveScale.value) {
-                printTemplate.preserveScale = true;
-                printTemplate.outScale = form.outScale.value;
-            } else {
-                printTemplate.preserveScale = false;
-            }
-
-            printTemplate.showAttribution = form.showAttribution.checked;
-            printTemplate.showLabels = form.showLabels.checked;
-
             printParams.template = printTemplate;
 
             return printParams;
