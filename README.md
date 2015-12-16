@@ -33,7 +33,7 @@ Below is the body of an HTML document.
                        name: "ArcGisPrintUI",
                        // You may have to adjust the location based on where you
                        // placed the bower module.
-                       location: root + "/bower_modules/arcgis-print-ui",
+                       location: root + "/bower_components/arcgis-print-ui",
                        main: "ArcGisPrintUI"
                    }
                 ]
