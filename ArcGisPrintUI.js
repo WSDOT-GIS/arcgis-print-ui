@@ -3,8 +3,9 @@ define([
     "esri/tasks/PrintTask",
     "esri/tasks/PrintParameters",
     "esri/tasks/PrintTemplate",
+    "dojo/_base/Deferred",
     "dojo/text!./Templates/ArcGisPrintUI.html"
-], function (PrintTask, PrintParameters, PrintTemplate, template) {
+], function (PrintTask, PrintParameters, PrintTemplate, Deferred, template) {
 
     /**
      * @external ScaleBarOptions
@@ -143,6 +144,31 @@ define([
             return printParams;
         }
 
+        function checkFile(url) {
+            var xmlhttp = new XMLHttpRequest();
+            // Using a synchronous call...
+            xmlhttp.open("GET", url, false);
+            xmlhttp.send();
+
+            if (xmlhttp.status === 500) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function waitForFile(url) {
+            var d = new Deferred();
+            var fileReady = false;
+
+            do {
+                fileReady = checkFile(url);
+            } while (!fileReady);
+
+            d.resolve();
+            return d;
+        }
+
         function startPrintJob() {
 
             var p = createPrintParameters();
@@ -152,7 +178,7 @@ define([
             var item = document.createElement("li");
             var prog = document.createElement("progress");
             item.appendChild(prog);
-            list.appendChild(item)
+            list.appendChild(item);
 
             function createLink(url) {
                 var a = document.createElement("a");
@@ -166,8 +192,12 @@ define([
                 // Remove progress bar.
                 item.removeChild(prog);
 
-                var link = createLink(response.url);
-                item.appendChild(link);
+                var fileDef = waitForFile(response.url);
+
+                fileDef.then(function() {
+                    var link = createLink(response.url);
+                    item.appendChild(link);
+                });
 
             }, function (error) {
                 item.removeChild(prog);
