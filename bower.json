@@ -1,6 +1,7 @@
 {
   "name": "arcgis-print-ui",
   "homepage": "https://github.com/WSDOT-GIS/arcgis-print-ui",
+  "version": "1.0.0",
   "authors": [
     "WSDOT-GIS"
   ],
@@ -20,6 +21,7 @@
     "**/.*",
     "*.csproj",
     "*.sln",
+    "demo",
     "bin",
     "obj",
     "node_modules",

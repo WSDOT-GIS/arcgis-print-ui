@@ -78,6 +78,7 @@ body {
     display: inline-block;
 }
 
+/* Set the progress meter to only show when it is loading data. */
 .map[data-updating] > .map-progress {
     display: block;
 }
