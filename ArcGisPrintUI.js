@@ -3,9 +3,10 @@ define([
     "esri/tasks/PrintTask",
     "esri/tasks/PrintParameters",
     "esri/tasks/PrintTemplate",
+    "esri/tasks/LegendLayer",
     "dojo/_base/Deferred",
     "dojo/text!./Templates/ArcGisPrintUI.html"
-], function (PrintTask, PrintParameters, PrintTemplate, Deferred, template) {
+], function (PrintTask, PrintParameters, PrintTemplate, LegendLayer, Deferred, template) {
 
     /**
      * @external ScaleBarOptions
@@ -109,6 +110,75 @@ define([
         return form;
     }
 
+    function getLegendLayersFromMap(map, sublayerThreshold) {
+        var layer, legendLayer, output = [];
+        if (sublayerThreshold === undefined) {
+            sublayerThreshold = 30;
+        }
+        for (var i = 0, l = map.layerIds.length; i < l; i += 1) {
+            layer = map.getLayer(map.layerIds[i]);
+            if (layer.visible && layer.visibleAtMapScale) {
+                legendLayer = new LegendLayer();
+                legendLayer.layerId = layer.id;
+                if (layer.visibleLayers) {
+                    legendLayer.subLayerIds = layer.visibleLayers;
+                }
+                if (legendLayer.subLayerIds.length < sublayerThreshold) {
+                    output.push(legendLayer);
+                }
+            }
+        }
+
+        // Return null if the output array has no elements.
+        return output.length > 0 ? output : null;
+    }
+
+    function addLayoutOptions(container, layoutOptions) {
+        var optionName, optionValue;
+
+        function handleOptionChange(event) {
+            var element = $(event.target), name = element.attr("name"), value = element.val();
+            if (value === "") {
+                value = null;
+            }
+
+            $this.options.layoutOptions[name] = value;
+
+        }
+
+        function createSelect() {
+            var select, values = ["Miles", "Kilometers", "Meters", "Feet"].sort(), i, l, value;
+
+            select = $("<select name='scalebarUnit'>").change(handleOptionChange);
+
+            for (i = 0, l = values.length; i < l; i++) {
+                value = values[i];
+                $("<option>").attr({
+                    value: value,
+                    selected: value === layoutOptions.scalebarUnit
+                }).text(value).appendTo(select);
+            }
+
+            return select;
+        }
+
+
+        for (optionName in layoutOptions) {
+            if (layoutOptions.hasOwnProperty(optionName)) {
+                optionValue = layoutOptions[optionName];
+                $("<label>").text(splitWords(optionName).join(" ")).appendTo(container);
+                if (optionName === "scalebarUnit") {
+                    createSelect().appendTo(container);
+                } else {
+                    $("<input>").attr({
+                        type: "text",
+                        name: optionName
+                    }).appendTo(container).val(optionValue).blur(handleOptionChange);
+                }
+            }
+        }
+    }
+
     /**
      * UI for PrintTask
      * @constructor
@@ -134,10 +204,12 @@ define([
 
             printTemplate.format = form.format.value;
             printTemplate.layout = form.layout.value;
-            printTemplate.titleText = form.titleText.value;
-            printTemplate.authorText = form.authorText.value;
-            printTemplate.copyrightText = form.copyrightText.value;
-            printTemplate.scalebarUnit = form.scalebarUnit.value;
+            printTemplate.layoutOptions = {};
+            printTemplate.layoutOptions.titleText = form.titleText.value;
+            printTemplate.layoutOptions.authorText = form.authorText.value;
+            printTemplate.layoutOptions.copyrightText = form.copyrightText.value;
+            printTemplate.layoutOptions.scalebarUnit = form.scalebarUnit.value;
+            printTemplate.layoutOptions.legendLayers = getLegendLayersFromMap(self.map);
 
             printParams.template = printTemplate;
 
