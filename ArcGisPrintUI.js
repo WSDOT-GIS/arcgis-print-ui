@@ -61,7 +61,7 @@ define([
 
     function populateFormFromParameters(form, svcInfo) {
         var i, l, p, select;
-        for (var i = 0, l = svcInfo.parameters.length; i < l; i++) {
+        for (i = 0, l = svcInfo.parameters.length; i < l; i++) {
             p = svcInfo.parameters[i];
             select = form.querySelector("[data-gp-parameter='" + p.name + "']");
             if (select) {
@@ -72,7 +72,8 @@ define([
 
     /**
      * Creates the print form
-     * @param {string} printURL
+     * @param {string} printUrl - URL for the print service.
+     * @returns {HTMLFormElement} Returns the print form.
      */
     function createForm(printUrl) {
         var parser = new DOMParser();
@@ -94,7 +95,7 @@ define([
             httpRequest.open("get", printUrl);
             httpRequest.onloadend = function () {
                 var serviceInfo;
-                if (this.status !== 200 || (this.response && this.response.error)) {
+                if (this.status !== 200 || this.response && this.response.error) {
                     return;
                 }
 
@@ -103,7 +104,7 @@ define([
                 form.dataset.isAsync = /async/i.test(serviceInfo.executionType);
 
                 populateFormFromParameters(form, serviceInfo);
-            }
+            };
             httpRequest.send();
         }
 
@@ -281,7 +282,8 @@ define([
 
         /**
          * Creates the print form
-         * @param {string} printURL
+         * @param {string} printUrl - URL for the print service
+         * @returns {HTMLFormElement} Returns the created HTML form.
          */
         function createForm(printUrl) {
             var parser = new DOMParser();
@@ -299,7 +301,7 @@ define([
                 httpRequest.open("get", printUrl.replace(/\?(.+)$/, "") + "?f=json");
                 httpRequest.onloadend = function () {
                     var serviceInfo;
-                    if (this.status !== 200 || (this.response && this.response.error)) {
+                    if (this.status !== 200 || this.response && this.response.error) {
                         return;
                     }
 
@@ -310,7 +312,7 @@ define([
                     });
 
                     populateFormFromParameters(form, serviceInfo);
-                }
+                };
                 httpRequest.send();
             }
 

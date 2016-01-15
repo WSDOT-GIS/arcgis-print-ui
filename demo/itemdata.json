@@ -1,0 +1,96 @@
+﻿{
+  "operationalLayers": [
+    {
+      "id": "RegionBoundaries",
+      "layerType": "ArcGISTiledMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/Shared/RegionBoundaries/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "Region Boundaries",
+      "itemId": "1c0845bd12944017b3bb3631bda09e0e"
+    },
+    {
+      "id": "LegislativeDistricts",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/Shared/LegislativeDistricts/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "Legislative Districts",
+      "itemId": "f6d17366bae34d5f996386c2d46263ec"
+    },
+    {
+      "id": "CountyBoundaries",
+      "layerType": "ArcGISTiledMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/Shared/CountyBoundaries/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "County Boundaries",
+      "itemId": "fe229f9df5aa4289b8ccd2a99289951b"
+    },
+    {
+      "id": "CityLimits",
+      "layerType": "ArcGISTiledMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/Shared/CityLimits/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "City Limits",
+      "itemId": "bb7c67c334be494c88cf00ebb91fe51f"
+    },
+    {
+      "id": "UncorrectedBarriersCaseArea",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/FishPassage/UncorrectedBarriersCaseArea/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "Uncorrected Barriers Subject to Injunction"
+    },
+    {
+      "id": "InDesignBarriersCaseArea",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/FishPassage/InDesignBarriersCaseArea/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "In Design Barriers Subject to Injunction"
+    },
+    {
+      "id": "CaseAreaBoundary",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/FishPassage/CaseAreaBoundary/MapServer",
+      "visibility": false,
+      "opacity": 1,
+      "title": "US v. WA Case Area Boundary"
+    },
+    {
+      "id": "CorrectedBarriersStatewide",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/FishPassage/CorrectedBarriersStatewide/MapServer",
+      "visibility": true,
+      "opacity": 1,
+      "title": "Corrected Barriers Statewide"
+    },
+    {
+      "id": "UncorrectedBarriersStatewide",
+      "layerType": "ArcGISMapServiceLayer",
+      "url": "http://www.wsdot.wa.gov/geosvcs/ArcGIS/rest/services/FishPassage/UncorrectedBarriersStatewide/MapServer",
+      "visibility": true,
+      "opacity": 1,
+      "title": "Uncorrected Barriers Statewide"
+    }
+  ],
+  "baseMap": {
+    "baseMapLayers": [
+      {
+        "id": "defaultBasemap",
+        "layerType": "ArcGISTiledMapServiceLayer",
+        "opacity": 1,
+        "visibility": true,
+        "url": "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
+      }
+    ],
+    "title": "Topographic"
+  },
+  "spatialReference": {
+    "wkid": 102100
+  },
+  "version": "2.1"
+}
