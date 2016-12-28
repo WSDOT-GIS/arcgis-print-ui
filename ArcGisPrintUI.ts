@@ -3,45 +3,38 @@ import PrintParameters = require("esri/tasks/PrintParameters");
 import PrintTemplate = require("esri/tasks/PrintTemplate");
 import LegendLayer = require("esri/tasks/LegendLayer");
 import Deferred = require("dojo/_base/Deferred");
-import template = require("dojo/text!./Templates/ArcGisPrintUI.html");
 import GPParameter from "./GPParameter";
 import { reviver } from "./GPParameter";
+import template = require("dojo/text!./Templates/ArcGisPrintUI.html");
 
+// import type references
 import EsriMap = require("esri/map");
 import Layer = require("esri/layers/layer");
 import ArcGISDynamicMapServiceLayer = require("esri/layers/ArcGISDynamicMapServiceLayer");
+import { GPTask, GPService } from "./GPService";
 
 /**
- * @external ScaleBarOptions
+ * Populates HTML form using service info.
  */
-
-/**
- * @external LayoutOptions
- * @see {@link http://resources.arcgis.com/en/help/arcgis-rest-api/index.html#/ExportWebMap_specification/02r3000001mz000000/#ESRI_SECTION1_58F5F403FCF048C2A5EBEF921BB97A10|layoutOptions}
- * @property {string} titleText
- * @property {string} authorText
- * @property {string} copyrightText
- */
-
-function populateFormFromParameters(form: HTMLFormElement, svcInfo: any) {
-    for (let p of svcInfo.parameters) {
-        let select = form.querySelector("[data-gp-parameter='" + p.name + "']");
+function populateFormFromParameters(form: HTMLFormElement, taskInfo: GPTask) {
+    for (let p of taskInfo.parameters) {
+        let select = form.querySelector(`[data-gp-parameter='${p.name}']`) as HTMLSelectElement;
         if (select) {
-            p.populateSelectWithChoices(select);
+            (p as GPParameter).populateSelectWithChoices(select);
         }
     }
 }
 
 /**
  * Creates the print form
- * @param {string} printUrl - URL for the print service.
- * @returns {HTMLFormElement} Returns the print form.
+ * @param printUrl - URL for the print service.
+ * @returns Returns the print form.
  */
 function createForm(printUrl: string) {
     let parser = new DOMParser();
     let doc = parser.parseFromString(template, "text/html");
-    let form = doc.body.querySelector("form") as HTMLFormElement;
-    form = form.cloneNode(true) as HTMLFormElement;
+    let form = doc.body.querySelector("form") as PrintTemplateForm;
+    form = form.cloneNode(true) as PrintTemplateForm;
 
     if (printUrl) {
         form.action = printUrl;
@@ -53,9 +46,9 @@ function createForm(printUrl: string) {
         fetch(printUrl).then(response => {
             return response.text();
         }).then(txt => {
-            let serviceInfo = JSON.parse(txt, reviver);
-            (form.dataset as any).isAsync = /async/i.test(serviceInfo.executionType);
-            populateFormFromParameters(form, serviceInfo);
+            let taskInfo = JSON.parse(txt, reviver) as GPTask;
+            (form.dataset as any).isAsync = /async/i.test(taskInfo.executionType);
+            populateFormFromParameters(form, taskInfo);
         });
     }
 
@@ -114,7 +107,7 @@ class PrintUI {
      * @property {esri/tasks/PrintTask} printTask
      * @property {HTMLFormElement} form
      */
-    constructor(printUrl: string, public map: EsriMap) {
+    constructor(printUrl: string, public map?: EsriMap) {
         // Add http: or https: if a protocol-relative URL is detected.
         if (/^\/\//.test(printUrl)) {
             printUrl = window.location.protocol + printUrl;
@@ -126,16 +119,6 @@ class PrintUI {
 
 
         function startPrintJob() {
-
-            let p = createPrintParameters(self.map, self.form as PrintTemplateForm);
-
-            let list = self._form.querySelector(".print-jobs-list") as HTMLUListElement;
-
-            let item = document.createElement("li");
-            let prog = document.createElement("progress");
-            item.appendChild(prog);
-            list.appendChild(item);
-
             function createLink(url: string) {
                 let a = document.createElement("a");
                 a.href = url;
@@ -144,63 +127,41 @@ class PrintUI {
                 return a;
             }
 
-            self.printTask.execute(p).then(function (response: any) {
-                // Remove progress bar.
-                item.removeChild(prog);
-                fetch(response.url as string).then(response => {
-                    let link = createLink(response.url);
-                    item.appendChild(link);
-                });
+            if (self.map) {
+                let p = createPrintParameters(self.map, self.form as PrintTemplateForm);
+
+                let list = self._form.querySelector(".print-jobs-list") as HTMLUListElement;
+
+                let item = document.createElement("li");
+                let prog = document.createElement("progress");
+                item.appendChild(prog);
+                list.appendChild(item);
 
 
-            }, function (error: Error) {
-                item.removeChild(prog);
-                item.textContent = error.message || error.toString();
-            });
+                self.printTask.execute(p).then(function (response: any) {
+                    // Remove progress bar.
+                    item.removeChild(prog);
+                    fetch(response.url as string).then(response => {
+                        let link = createLink(response.url);
+                        item.appendChild(link);
+                    });
 
-            return false;
-        }
 
-        /**
-         * Creates the print form
-         * @param {string} printUrl - URL for the print service
-         * @returns {HTMLFormElement} Returns the created HTML form.
-         */
-        function createForm(printUrl: string) {
-            let parser = new DOMParser();
-            let doc = parser.parseFromString(template, "text/html");
-            let form: HTMLFormElement = doc.body.querySelector("form") as HTMLFormElement;
-            form = form.cloneNode(true) as HTMLFormElement;
-
-            if (printUrl) {
-                // Remove all URL parameters.
-                let requestUrl = printUrl.replace(/\?(.+)$/, "") + "?f=json";
-                let promise = fetch(requestUrl);
-                promise.then(response => {
-                    return response.text();
-                }).then(txt => {
-                    let serviceInfo = JSON.parse(txt, reviver);
-                    if (!serviceInfo.error) {
-                        self._printTask = new PrintTask(printUrl, {
-                            async: /async/i.test(serviceInfo.executionType)
-                        });
-                        populateFormFromParameters(form, serviceInfo);
-                    }
+                }, function (error: Error) {
+                    item.removeChild(prog);
+                    item.textContent = error.message || error.toString();
                 });
             }
 
-
-            form.onsubmit = startPrintJob;
-
-            return form;
+            return false;
         }
     }
     private _printTask: PrintTask;
-    private _form: HTMLFormElement;
+    private _form: PrintTemplateForm;
     get printTask(): PrintTask {
         return this._printTask;
     }
-    get form(): HTMLFormElement {
+    get form(): PrintTemplateForm {
         return this._form;
     }
 }

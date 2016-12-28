@@ -1,17 +1,10 @@
-define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate", "esri/tasks/LegendLayer", "dojo/text!./Templates/ArcGisPrintUI.html", "./GPParameter"], function (require, exports, PrintTask, PrintParameters, PrintTemplate, LegendLayer, template, GPParameter_1) {
+define(["require", "exports", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate", "esri/tasks/LegendLayer", "./GPParameter", "dojo/text!./Templates/ArcGisPrintUI.html"], function (require, exports, PrintParameters, PrintTemplate, LegendLayer, GPParameter_1, template) {
     "use strict";
     /**
-     * @external ScaleBarOptions
+     * Populates HTML form using service info.
      */
-    /**
-     * @external LayoutOptions
-     * @see {@link http://resources.arcgis.com/en/help/arcgis-rest-api/index.html#/ExportWebMap_specification/02r3000001mz000000/#ESRI_SECTION1_58F5F403FCF048C2A5EBEF921BB97A10|layoutOptions}
-     * @property {string} titleText
-     * @property {string} authorText
-     * @property {string} copyrightText
-     */
-    function populateFormFromParameters(form, svcInfo) {
-        for (var _i = 0, _a = svcInfo.parameters; _i < _a.length; _i++) {
+    function populateFormFromParameters(form, taskInfo) {
+        for (var _i = 0, _a = taskInfo.parameters; _i < _a.length; _i++) {
             var p = _a[_i];
             var select = form.querySelector("[data-gp-parameter='" + p.name + "']");
             if (select) {
@@ -21,8 +14,8 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
     }
     /**
      * Creates the print form
-     * @param {string} printUrl - URL for the print service.
-     * @returns {HTMLFormElement} Returns the print form.
+     * @param printUrl - URL for the print service.
+     * @returns Returns the print form.
      */
     function createForm(printUrl) {
         var parser = new DOMParser();
@@ -38,9 +31,9 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
             fetch(printUrl).then(function (response) {
                 return response.text();
             }).then(function (txt) {
-                var serviceInfo = JSON.parse(txt, GPParameter_1.reviver);
-                form.dataset.isAsync = /async/i.test(serviceInfo.executionType);
-                populateFormFromParameters(form, serviceInfo);
+                var taskInfo = JSON.parse(txt, GPParameter_1.reviver);
+                form.dataset.isAsync = /async/i.test(taskInfo.executionType);
+                populateFormFromParameters(form, taskInfo);
             });
         }
         return form;
@@ -101,12 +94,6 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
             this._form = createForm(printUrl);
             var self = this;
             function startPrintJob() {
-                var p = createPrintParameters(self.map, self.form);
-                var list = self._form.querySelector(".print-jobs-list");
-                var item = document.createElement("li");
-                var prog = document.createElement("progress");
-                item.appendChild(prog);
-                list.appendChild(item);
                 function createLink(url) {
                     var a = document.createElement("a");
                     a.href = url;
@@ -114,47 +101,26 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
                     a.target = "arcgisprintout";
                     return a;
                 }
-                self.printTask.execute(p).then(function (response) {
-                    // Remove progress bar.
-                    item.removeChild(prog);
-                    fetch(response.url).then(function (response) {
-                        var link = createLink(response.url);
-                        item.appendChild(link);
-                    });
-                }, function (error) {
-                    item.removeChild(prog);
-                    item.textContent = error.message || error.toString();
-                });
-                return false;
-            }
-            /**
-             * Creates the print form
-             * @param {string} printUrl - URL for the print service
-             * @returns {HTMLFormElement} Returns the created HTML form.
-             */
-            function createForm(printUrl) {
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(template, "text/html");
-                var form = doc.body.querySelector("form");
-                form = form.cloneNode(true);
-                if (printUrl) {
-                    // Remove all URL parameters.
-                    var requestUrl = printUrl.replace(/\?(.+)$/, "") + "?f=json";
-                    var promise = fetch(requestUrl);
-                    promise.then(function (response) {
-                        return response.text();
-                    }).then(function (txt) {
-                        var serviceInfo = JSON.parse(txt, GPParameter_1.reviver);
-                        if (!serviceInfo.error) {
-                            self._printTask = new PrintTask(printUrl, {
-                                async: /async/i.test(serviceInfo.executionType)
-                            });
-                            populateFormFromParameters(form, serviceInfo);
-                        }
+                if (self.map) {
+                    var p = createPrintParameters(self.map, self.form);
+                    var list = self._form.querySelector(".print-jobs-list");
+                    var item_1 = document.createElement("li");
+                    var prog_1 = document.createElement("progress");
+                    item_1.appendChild(prog_1);
+                    list.appendChild(item_1);
+                    self.printTask.execute(p).then(function (response) {
+                        // Remove progress bar.
+                        item_1.removeChild(prog_1);
+                        fetch(response.url).then(function (response) {
+                            var link = createLink(response.url);
+                            item_1.appendChild(link);
+                        });
+                    }, function (error) {
+                        item_1.removeChild(prog_1);
+                        item_1.textContent = error.message || error.toString();
                     });
                 }
-                form.onsubmit = startPrintJob;
-                return form;
+                return false;
             }
         }
         Object.defineProperty(PrintUI.prototype, "printTask", {
