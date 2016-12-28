@@ -1,11 +1,11 @@
-﻿/*global require*/
+/*global require*/
 require([
     "esri/config",
     "esri/arcgis/utils",
     "ArcGisPrintUI",
     "dojo/text!./itemdata.json"
 ], function (esriConfig, arcgisUtils, ArcGisPrintUI, itemdata) {
-    var printUrl = "http://data.wsdot.wa.gov/arcgis/rest/services/FishPassage/FishPassageExportWebMap/GPServer/Export Web Map";
+    var printUrl = "//data.wsdot.wa.gov/arcgis/rest/services/FishPassage/FishPassageExportWebMap/GPServer/Export Web Map";
 
     var printForm = new ArcGisPrintUI(printUrl);
     var form = printForm.form;
