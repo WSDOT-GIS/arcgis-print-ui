@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate", "esri/tasks/LegendLayer", "dojo/text!./Templates/ArcGisPrintUI.html", "./utils"], function (require, exports, PrintTask, PrintParameters, PrintTemplate, LegendLayer, template, utils_1) {
+define(["require", "exports", "esri/tasks/PrintTask", "dojo/text!./Templates/ArcGisPrintUI.html", "./utils"], function (require, exports, PrintTask, template, utils_1) {
     "use strict";
     /**
      * Populates HTML form using service info.
@@ -26,43 +26,6 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
             form.action = printUrl;
         }
         return form;
-    }
-    function getLegendLayersFromMap(map, sublayerThreshold) {
-        if (sublayerThreshold === void 0) { sublayerThreshold = 30; }
-        var output = [];
-        for (var _i = 0, _a = map.layerIds; _i < _a.length; _i++) {
-            var layerId = _a[_i];
-            var layer = map.getLayer(layerId);
-            if (layer.visible && layer.visibleAtMapScale) {
-                var legendLayer = new LegendLayer();
-                legendLayer.layerId = layer.id;
-                if (layer.visibleLayers) {
-                    legendLayer.subLayerIds = layer.visibleLayers;
-                }
-                if (legendLayer.subLayerIds.length < sublayerThreshold) {
-                    output.push(legendLayer);
-                }
-            }
-        }
-        // Return null if the output array has no elements.
-        return output.length > 0 ? output : null;
-    }
-    function createPrintParameters(map, form) {
-        var printParams = new PrintParameters();
-        printParams.map = map;
-        var printTemplate = new PrintTemplate();
-        // TODO: printTemplate.exportOptions
-        printTemplate.format = form.format.value;
-        printTemplate.layout = form.layout.value;
-        printTemplate.layoutOptions = {
-            titleText: form.titleText.value,
-            authorText: form.authorText.value,
-            copyrightText: form.copyrightText.value,
-            scalebarUnit: form.scalebarUnit.value,
-            legendLayers: getLegendLayersFromMap(map)
-        };
-        printParams.template = printTemplate;
-        return printParams;
     }
     var PrintUI = (function () {
         /**
@@ -101,7 +64,7 @@ define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameter
                     return a;
                 }
                 if (self.map) {
-                    var p = createPrintParameters(self.map, self.form);
+                    var p = utils_1.createPrintParameters(self.map, self.form);
                     var list = self._form.querySelector(".print-jobs-list");
                     var item_1 = document.createElement("li");
                     var prog_1 = document.createElement("progress");

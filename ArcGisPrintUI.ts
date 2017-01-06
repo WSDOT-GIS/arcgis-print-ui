@@ -1,18 +1,11 @@
 import PrintTask = require("esri/tasks/PrintTask");
-import PrintParameters = require("esri/tasks/PrintParameters");
-import PrintTemplate = require("esri/tasks/PrintTemplate");
-import LegendLayer = require("esri/tasks/LegendLayer");
-import Deferred = require("dojo/_base/Deferred");
 import GPParameter from "./GPParameter";
-import { reviver } from "./GPParameter";
 import template = require("dojo/text!./Templates/ArcGisPrintUI.html");
-import { getPrintTaskInfo } from "./utils";
+import { getPrintTaskInfo, createPrintParameters } from "./utils";
 
 // import type references
 import EsriMap = require("esri/map");
-import Layer = require("esri/layers/layer");
-import ArcGISDynamicMapServiceLayer = require("esri/layers/ArcGISDynamicMapServiceLayer");
-import { GPTask, GPService } from "./GPService";
+import { GPTask } from "./GPService";
 
 /**
  * Populates HTML form using service info.
@@ -42,48 +35,6 @@ function createForm(printUrl: string) {
     }
 
     return form;
-}
-
-function getLegendLayersFromMap(map: EsriMap, sublayerThreshold: number = 30) {
-    let output: LegendLayer[] = [];
-    for (let layerId of map.layerIds) {
-        let layer = map.getLayer(layerId) as ArcGISDynamicMapServiceLayer;
-        if (layer.visible && layer.visibleAtMapScale) {
-            let legendLayer = new LegendLayer();
-            legendLayer.layerId = layer.id;
-            if (layer.visibleLayers) {
-                (legendLayer as any).subLayerIds = layer.visibleLayers;
-            }
-            if (legendLayer.subLayerIds.length < sublayerThreshold) {
-                output.push(legendLayer);
-            }
-        }
-    }
-
-    // Return null if the output array has no elements.
-    return output.length > 0 ? output : null;
-}
-
-function createPrintParameters(map: EsriMap, form: PrintTemplateForm) {
-    let printParams = new PrintParameters();
-    printParams.map = map;
-
-    let printTemplate = new PrintTemplate();
-    // TODO: printTemplate.exportOptions
-
-    printTemplate.format = form.format.value;
-    printTemplate.layout = form.layout.value;
-    printTemplate.layoutOptions = {
-        titleText: form.titleText.value,
-        authorText: form.authorText.value,
-        copyrightText: form.copyrightText.value,
-        scalebarUnit: form.scalebarUnit.value,
-        legendLayers: getLegendLayersFromMap(map)
-    };
-
-    printParams.template = printTemplate;
-
-    return printParams;
 }
 
 class PrintUI {
