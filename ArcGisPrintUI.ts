@@ -6,6 +6,7 @@ import Deferred = require("dojo/_base/Deferred");
 import GPParameter from "./GPParameter";
 import { reviver } from "./GPParameter";
 import template = require("dojo/text!./Templates/ArcGisPrintUI.html");
+import { getPrintTaskInfo } from "./utils";
 
 // import type references
 import EsriMap = require("esri/map");
@@ -38,18 +39,6 @@ function createForm(printUrl: string) {
 
     if (printUrl) {
         form.action = printUrl;
-        // Remove all URL parameters.
-        printUrl = printUrl.replace(/\?(.+)$/, "");
-        // Append the JSON format parameter.
-        printUrl += "?f=json";
-
-        fetch(printUrl).then(response => {
-            return response.text();
-        }).then(txt => {
-            let taskInfo = JSON.parse(txt, reviver) as GPTask;
-            (form.dataset as any).isAsync = /async/i.test(taskInfo.executionType);
-            populateFormFromParameters(form, taskInfo);
-        });
     }
 
     return form;
@@ -113,12 +102,20 @@ class PrintUI {
             printUrl = window.location.protocol + printUrl;
         }
         this._form = createForm(printUrl);
+        this._form.addEventListener("submit", startPrintJob);
+        getPrintTaskInfo(this._form.action).then(info => {
+            this._printTask = new PrintTask(printUrl, {
+                async: info.executionType === "esriExecutionTypeAsynchronous"
+            });
+            populateFormFromParameters(this._form, info);
+        }, error => {
+            throw error;
+        });
 
         let self = this;
 
 
-
-        function startPrintJob() {
+        function startPrintJob(e: Event) {
             function createLink(url: string) {
                 let a = document.createElement("a");
                 a.href = url;
@@ -137,7 +134,6 @@ class PrintUI {
                 item.appendChild(prog);
                 list.appendChild(item);
 
-
                 self.printTask.execute(p).then(function (response: any) {
                     // Remove progress bar.
                     item.removeChild(prog);
@@ -153,7 +149,7 @@ class PrintUI {
                 });
             }
 
-            return false;
+            e.preventDefault();
         }
     }
     private _printTask: PrintTask;

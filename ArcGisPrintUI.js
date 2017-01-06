@@ -1,4 +1,4 @@
-define(["require", "exports", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate", "esri/tasks/LegendLayer", "./GPParameter", "dojo/text!./Templates/ArcGisPrintUI.html"], function (require, exports, PrintParameters, PrintTemplate, LegendLayer, GPParameter_1, template) {
+define(["require", "exports", "esri/tasks/PrintTask", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate", "esri/tasks/LegendLayer", "dojo/text!./Templates/ArcGisPrintUI.html", "./utils"], function (require, exports, PrintTask, PrintParameters, PrintTemplate, LegendLayer, template, utils_1) {
     "use strict";
     /**
      * Populates HTML form using service info.
@@ -24,17 +24,6 @@ define(["require", "exports", "esri/tasks/PrintParameters", "esri/tasks/PrintTem
         form = form.cloneNode(true);
         if (printUrl) {
             form.action = printUrl;
-            // Remove all URL parameters.
-            printUrl = printUrl.replace(/\?(.+)$/, "");
-            // Append the JSON format parameter.
-            printUrl += "?f=json";
-            fetch(printUrl).then(function (response) {
-                return response.text();
-            }).then(function (txt) {
-                var taskInfo = JSON.parse(txt, GPParameter_1.reviver);
-                form.dataset.isAsync = /async/i.test(taskInfo.executionType);
-                populateFormFromParameters(form, taskInfo);
-            });
         }
         return form;
     }
@@ -86,14 +75,24 @@ define(["require", "exports", "esri/tasks/PrintParameters", "esri/tasks/PrintTem
          * @property {HTMLFormElement} form
          */
         function PrintUI(printUrl, map) {
+            var _this = this;
             this.map = map;
             // Add http: or https: if a protocol-relative URL is detected.
             if (/^\/\//.test(printUrl)) {
                 printUrl = window.location.protocol + printUrl;
             }
             this._form = createForm(printUrl);
+            this._form.addEventListener("submit", startPrintJob);
+            utils_1.getPrintTaskInfo(this._form.action).then(function (info) {
+                _this._printTask = new PrintTask(printUrl, {
+                    async: info.executionType === "esriExecutionTypeAsynchronous"
+                });
+                populateFormFromParameters(_this._form, info);
+            }, function (error) {
+                throw error;
+            });
             var self = this;
-            function startPrintJob() {
+            function startPrintJob(e) {
                 function createLink(url) {
                     var a = document.createElement("a");
                     a.href = url;
@@ -120,7 +119,7 @@ define(["require", "exports", "esri/tasks/PrintParameters", "esri/tasks/PrintTem
                         item_1.textContent = error.message || error.toString();
                     });
                 }
-                return false;
+                e.preventDefault();
             }
         }
         Object.defineProperty(PrintUI.prototype, "printTask", {
