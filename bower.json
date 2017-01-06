@@ -5,7 +5,11 @@
     "WSDOT-GIS"
   ],
   "description": "UI for ArcGIS Server print services",
-  "main": "ArcGisPrintUI.js",
+  "main": [
+    "ArcGisPrintUI.js",
+    "GPParameter.js",
+    "Templates/ArcGisPrintUI.html"
+  ],
   "moduleType": [
     "amd"
   ],
