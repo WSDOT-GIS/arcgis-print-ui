@@ -2,7 +2,7 @@
 import PrintTask = require("esri/tasks/PrintTask");
 import EsriMap = require("esri/map");
 declare class PrintUI {
-    map: EsriMap;
+    map?: EsriMap | undefined;
     /**
      * UI for PrintTask
      * @constructor
@@ -12,7 +12,7 @@ declare class PrintUI {
      * @property {esri/tasks/PrintTask} printTask
      * @property {HTMLFormElement} form
      */
-    constructor(printUrl: string, map?: EsriMap);
+    constructor(printUrl: string, map?: EsriMap | undefined);
     private _printTask;
     private _form;
     readonly printTask: PrintTask;

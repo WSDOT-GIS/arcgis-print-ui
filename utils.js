@@ -1,5 +1,6 @@
 define(["require", "exports", "./GPParameter", "esri/tasks/LegendLayer", "esri/tasks/PrintParameters", "esri/tasks/PrintTemplate"], function (require, exports, GPParameter_1, LegendLayer, PrintParameters, PrintTemplate) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     function getPrintTaskInfo(printUrl) {
         // Remove all URL parameters.
         printUrl = printUrl.replace(/\?(.+)$/, "");

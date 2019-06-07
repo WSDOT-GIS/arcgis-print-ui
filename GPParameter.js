@@ -1,9 +1,10 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * GPParameter
      */
-    var GPParameter = (function () {
+    var GPParameter = /** @class */ (function () {
         function GPParameter(options) {
             this.populateSelectWithChoices = function (selectNode) {
                 if (!this.choiceList || !Array.isArray(this.choiceList)) {
@@ -34,7 +35,6 @@ define(["require", "exports"], function (require, exports) {
         }
         return GPParameter;
     }());
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = GPParameter;
     function reviver(k, v) {
         if (v && v.hasOwnProperty && v.hasOwnProperty("parameterType")) {

@@ -1,6 +1,6 @@
 {
   "name": "arcgis-print-ui",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "UI for ArcGIS Print service",
   "main": "ArcGisPrintUI.js",
   "files": [
@@ -13,7 +13,7 @@
     "template.d.ts"
   ],
   "scripts": {
-    "prepublish": "tsc"
+    "prepare": "tsc"
   },
   "repository": {
     "type": "git",
@@ -31,9 +31,8 @@
   },
   "homepage": "https://github.com/WSDOT-GIS/arcgis-print-ui#readme",
   "devDependencies": {
-    "@types/arcgis-js-api": "^3.19.0",
-    "@types/dojo": "^1.9.37",
-    "@types/whatwg-fetch": "0.0.33",
-    "typescript": "^2.1.4"
+    "@types/arcgis-js-api": "^3.28.1",
+    "@types/dojo": "^1.9.41",
+    "typescript": "^3.5.1"
   }
 }

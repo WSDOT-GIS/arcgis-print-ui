@@ -27,7 +27,7 @@ define(["require", "exports", "esri/tasks/PrintTask", "dojo/text!./Templates/Arc
         }
         return form;
     }
-    var PrintUI = (function () {
+    var PrintUI = /** @class */ (function () {
         /**
          * UI for PrintTask
          * @constructor
@@ -56,6 +56,18 @@ define(["require", "exports", "esri/tasks/PrintTask", "dojo/text!./Templates/Arc
             });
             var self = this;
             function startPrintJob(e) {
+                function forceHttps(url) {
+                    var httpsRe = /^https\:/i;
+                    // If URL is already https, return input URL.
+                    if (httpsRe.test(url)) {
+                        return url;
+                    }
+                    var wsdotUrlRe = /^http\:\/\/data.wsdot.wa.gov\//i;
+                    if (location.href && httpsRe.test(location.href) && wsdotUrlRe.test(url)) {
+                        return url.replace(/^http\:/, "https:");
+                    }
+                    return url;
+                }
                 function createLink(url) {
                     var a = document.createElement("a");
                     a.href = url;
@@ -73,8 +85,9 @@ define(["require", "exports", "esri/tasks/PrintTask", "dojo/text!./Templates/Arc
                     self.printTask.execute(p).then(function (response) {
                         // Remove progress bar.
                         item_1.removeChild(prog_1);
-                        fetch(response.url).then(function (response) {
-                            var link = createLink(response.url);
+                        var url = forceHttps(response.url);
+                        fetch(url).then(function (response) {
+                            var link = createLink(url);
                             item_1.appendChild(link);
                         });
                     }, function (error) {

@@ -67,6 +67,20 @@ class PrintUI {
 
 
         function startPrintJob(e: Event) {
+
+            function forceHttps(url: string): string {
+                const httpsRe = /^https\:/i;
+                // If URL is already https, return input URL.
+                if (httpsRe.test(url)) {
+                    return url;
+                }
+                const wsdotUrlRe = /^http\:\/\/data.wsdot.wa.gov\//i;
+                if (location.href && httpsRe.test(location.href) && wsdotUrlRe.test(url)) {
+                    return url.replace(/^http\:/, "https:");
+                }
+                return url;
+            }
+
             function createLink(url: string) {
                 let a = document.createElement("a");
                 a.href = url;
@@ -88,8 +102,9 @@ class PrintUI {
                 self.printTask.execute(p).then(function (response: any) {
                     // Remove progress bar.
                     item.removeChild(prog);
-                    fetch(response.url as string).then(response => {
-                        let link = createLink(response.url);
+                    const url = forceHttps(response.url);
+                    fetch(url).then(response => {
+                        let link = createLink(url);
                         item.appendChild(link);
                     });
 
